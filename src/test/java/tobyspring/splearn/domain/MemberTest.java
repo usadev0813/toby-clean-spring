@@ -22,7 +22,7 @@ class MemberTest {
                 return encode(password).equals(passwordHash);
             }
         };
-        member = Member.create("usadev0813@gmail.com", "usadev", "secret", passwordEncoder);
+        member = Member.create(new MemberCreateRequest("usadev0813@gmail.com", "usadev", "secret"), passwordEncoder);
     }
 
     @Test
@@ -83,5 +83,18 @@ class MemberTest {
         member.changePassword("verysecret", passwordEncoder);
 
         assertThat(member.verifyPassword("verysecret", passwordEncoder)).isTrue();
+    }
+
+    @Test
+    void 활성상태() {
+        assertThat(member.isActive()).isFalse();
+
+        member.activate();
+
+        assertThat(member.isActive()).isTrue();
+
+        member.deactivated();
+
+        assertThat(member.isActive()).isFalse();
     }
 }
