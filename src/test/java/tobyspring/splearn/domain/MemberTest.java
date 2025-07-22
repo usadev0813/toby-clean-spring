@@ -97,4 +97,14 @@ class MemberTest {
 
         assertThat(member.isActive()).isFalse();
     }
+
+    @Test
+    void 잘못된이메일() {
+        assertThatThrownBy(() ->
+                Member.create(new MemberCreateRequest("invalid email", "usadev", "secret"), passwordEncoder))
+                .isInstanceOf(IllegalArgumentException.class);
+
+
+        Member.create(new MemberCreateRequest("usadev0813@gmail.com", "usadev", "secret"), passwordEncoder);
+    }
 }
