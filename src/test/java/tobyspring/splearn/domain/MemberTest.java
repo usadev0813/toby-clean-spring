@@ -1,29 +1,38 @@
 package tobyspring.splearn.domain;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class MemberTest {
+    Member member;
+    PasswordEncoder passwordEncoder;
+
+    @BeforeEach
+    void setUp() {
+        this.passwordEncoder = new PasswordEncoder() {
+            @Override
+            public String encode(String password) {
+                return password.toUpperCase();
+            }
+
+            @Override
+            public boolean matches(String password, String passwordHash) {
+                return encode(password).equals(passwordHash);
+            }
+        };
+        member = Member.create("usadev0813@gmail.com", "usadev", "secret", passwordEncoder);
+    }
+
     @Test
     void 멤버가_새로_만들어질떄_상태는_PENDING_이여야한다() {
-        var member = new Member("usadev0813@gmail.com", "usadev", "secret");
-
         assertThat(member.getStatus()).isEqualTo(MemberStatus.PENDING);
 
     }
 
     @Test
-    void 멤버생성자_NULL_체크() {
-        assertThatThrownBy(() -> new Member(null, "usadev", "secret"))
-                .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
     void 멤버활성화() {
-        var member = new Member("usadev0813@gmail.com", "usadev", "secret");
-
         member.activate();
 
         assertThat(member.getStatus()).isEqualTo(MemberStatus.ACTIVE);
@@ -31,8 +40,6 @@ class MemberTest {
 
     @Test
     void 멤버활성화_실패() {
-        var member = new Member("usadev0813@gmail.com", "usadev", "secret");
-
         member.activate();
 
         assertThatThrownBy(member::activate).isInstanceOf(IllegalStateException.class);
@@ -40,7 +47,6 @@ class MemberTest {
 
     @Test
     void 멤버탈퇴() {
-        var member = new Member("usadev0813@gmail.com", "usadev", "secret");
         member.activate();
 
         member.deactivated();
@@ -50,13 +56,32 @@ class MemberTest {
 
     @Test
     void 멤버탈퇴_실패() {
-        var member = new Member("usadev0813@gmail.com", "usadev", "secret");
-
         assertThatThrownBy(member::deactivated).isInstanceOf(IllegalStateException.class);
 
         member.activate();
         member.deactivated();
 
         assertThatThrownBy(member::deactivated).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 비밀번호검증() {
+        assertThat(member.verifyPassword("secret", passwordEncoder)).isTrue();
+        assertThat(member.verifyPassword("hello", passwordEncoder)).isFalse();
+    }
+
+    @Test
+    void 닉네임변경() {
+        assertThat(member.getNickname()).isEqualTo("usadev");
+        member.changeNickname("Maru");
+
+        assertThat(member.getNickname()).isEqualTo("Maru");
+    }
+
+    @Test
+    void 비밀번호변경() {
+        member.changePassword("verysecret", passwordEncoder);
+
+        assertThat(member.verifyPassword("verysecret", passwordEncoder)).isTrue();
     }
 }
