@@ -22,6 +22,7 @@ public class Member {
     private Long id;
 
     @Embedded
+    @NaturalId
     private Email email;
 
     private String nickname;
@@ -29,7 +30,6 @@ public class Member {
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    @NaturalId
     private MemberStatus status;
 
     public static Member register(MemberRegisterRequest createRequest, PasswordEncoder passwordEncoder) {
