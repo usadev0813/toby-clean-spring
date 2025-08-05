@@ -14,7 +14,8 @@ import tobyspring.splearn.domain.*;
 @Transactional
 @Validated
 @RequiredArgsConstructor
-public class MemberService implements MemberRegister, MemberFinder {
+public class MemberModifyService implements MemberRegister {
+    private final MemberFinder memberFinder;
     private final MemberRepository memberRepository;
     private final EmailSender emailSender;
     private final PasswordEncoder passwordEncoder;
@@ -34,8 +35,7 @@ public class MemberService implements MemberRegister, MemberFinder {
 
     @Override
     public Member activate(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(
-                () -> new IllegalArgumentException("회원을 찾을 수 없습니다. id: " + memberId));
+        Member member = memberFinder.find(memberId);
 
         member.activate();
 
@@ -50,10 +50,5 @@ public class MemberService implements MemberRegister, MemberFinder {
         if (memberRepository.findByEmail(new Email(registerRequest.email())).isPresent()) {
             throw new DuplicateEmailException("이미 사용중인 이메일입니다: " + registerRequest.email());
         }
-    }
-
-    @Override
-    public Member find(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다. id: " + memberId));
     }
 }
