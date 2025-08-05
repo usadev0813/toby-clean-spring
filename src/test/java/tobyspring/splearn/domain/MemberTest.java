@@ -58,16 +58,16 @@ class MemberTest {
 
     @Test
     void 비밀번호검증() {
-        assertThat(member.verifyPassword("secret", passwordEncoder)).isTrue();
+        assertThat(member.verifyPassword("verysecret", passwordEncoder)).isTrue();
         assertThat(member.verifyPassword("hello", passwordEncoder)).isFalse();
     }
 
     @Test
     void 닉네임변경() {
-        assertThat(member.getNickname()).isEqualTo("usadev");
-        member.changeNickname("Maru");
+        assertThat(member.getNickname()).isEqualTo("Charlie");
+        member.changeNickname("Maruaaaaa");
 
-        assertThat(member.getNickname()).isEqualTo("Maru");
+        assertThat(member.getNickname()).isEqualTo("Maruaaaaa");
     }
 
     @Test
